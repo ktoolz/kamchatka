@@ -1,33 +1,341 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.framagit.jmdesprez</groupId>
+    <!--
+        Basic information about our project.
+        Nothing special here.
+    -->
+
+    <groupId>com.github.ktoolz</groupId>
     <artifactId>kamchatka</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Kamchatka</name>
+    <description>Builder allowing to create a farm of Grizzly servers.</description>
+    <url>https://github.com/ktoolz/kamchatka</url>
+    <inceptionYear>2016</inceptionYear>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <kotlin.version>1.0.4</kotlin.version>
-        <junit.version>4.12</junit.version>
-        <jerser.version>2.23.2</jerser.version>
-        <rezult.version>1.2.1-SNAPSHOT</rezult.version>
-    </properties>
+    <!--
+       Hello!
+       Wanna know how repositories are managed?
+       Let's go for an easy peasy explanation:
+       - jetbrains repository is here for all kotlin related dependencies,
+       - jcenter is kind of another central repository, we'll put it here to retrieve our releases,
+       - oss.jfrog are there cause we'll deliver on it as well (our snapshots mainly) so we'll be able to retrieve stuff from here as well,
+       In any case, the <repositories> part is just here to declare some repositories on which we'll search for dependencies,
+       nothing related to where we deploy.
+       It's here also for CI to work smooth.
+       You don't need any particular configuration in order to make it work, since it's just reading the repositories.
+   -->
 
     <repositories>
+        <repository>
+            <id>jebrains-all</id>
+            <url>http://repository.jetbrains.com/all</url>
+        </repository>
         <repository>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
-            <id>central</id>
+            <id>jcenter</id>
             <name>bintray</name>
             <url>http://jcenter.bintray.com</url>
         </repository>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>jfrog-releases</id>
+            <name>oss-jfrog-releases</name>
+            <url>http://oss.jfrog.org/artifactory/simple/libs-release/</url>
+        </repository>
+        <repository>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <id>jfrog-snapshots</id>
+            <name>oss-jfrog-snapshots</name>
+            <url>http://oss.jfrog.org/artifactory/simple/libs-snapshot/</url>
+        </repository>
     </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>jcenter</id>
+            <name>bintray</name>
+            <url>https://jcenter.bintray.com/</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <!--
+        Back to business, let's link the project a bit to github ;)
+    -->
+
+    <issueManagement>
+        <system>github</system>
+        <url>https://github.com/ktoolz/kamchatka/issues</url>
+    </issueManagement>
+
+    <!--
+    - "Hey! You could use SSH, it's soooo much better!"
+    - "Yep but we're working behind a company proxy which doesn't allow us to do so..."
+    - "Oh! You're working on that during company time?"
+    - "Nope, during lunch break, but the proxy is still there..."
+    -->
+
+    <scm>
+        <connection>scm:git:https://github.com/ktoolz/kamchatka.git</connection>
+        <developerConnection>scm:git:https://github.com/ktoolz/kamchatka.git</developerConnection>
+        <url>https://github.com/ktoolz/kamchatka</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <!--
+       License and developers.
+       We definitely didn't chose the license randomly.
+       Not at all.
+   -->
+
+    <licenses>
+        <license>
+            <name>MIT</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+            <comments>MIT License</comments>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Jean-Marc Desprez</name>
+            <id>jmdesprez</id>
+        </developer>
+        <developer>
+            <name>Aurelie Pusch</name>
+            <id>Lilous</id>
+        </developer>
+        <developer>
+            <name>Antoine Neveux</name>
+            <id>aneveux</id>
+        </developer>
+    </developers>
+
+    <!--
+       Delivery related stuff.
+       Like all the repositories we're deploying to.
+       It's based on bintray for releases, and jfrog oss for snapshots.
+       Have a look:
+       - Here for snapshots: https://www.jfrog.com/confluence/display/RTF/Deploying+Snapshots+to+oss.jfrog.org
+       - Here for releases: https://bintray.com/ktoolz/maven/kamchatka
+   -->
+
+    <distributionManagement>
+        <repository>
+            <id>bintray</id>
+            <name>bintray-ktoolz</name>
+            <url>https://api.bintray.com/maven/ktoolz/maven/kamchatka/;publish=1</url>
+        </repository>
+        <!-- Using bintray as an id cause both credentials are linked ;) -->
+        <snapshotRepository>
+            <id>bintray</id>
+            <name>jfrog-oss-snapshots</name>
+            <url>https://oss.jfrog.org/artifactory/oss-snapshot-local</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.0.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <!--
+        Now let's define all the versions and dependencies for the project.
+        Also all the plugins that will be used in our project.
+    -->
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <kotlin.version>1.0.4</kotlin.version>
+        <junit.version>4.12</junit.version>
+        <jerser.version>2.23.2</jerser.version>
+        <rezult.version>1.2.1</rezult.version>
+    </properties>
+
+    <build>
+        <sourceDirectory>src/main/kotlin</sourceDirectory>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>kotlin-maven-plugin</artifactId>
+                    <groupId>org.jetbrains.kotlin</groupId>
+                    <version>${kotlin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>compile</id>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>test-compile</id>
+                            <goals>
+                                <goal>test-compile</goal>
+                            </goals>
+                            <configuration>
+                                <sourceDirs>
+                                    <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
+                                </sourceDirs>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.jetbrains.dokka</groupId>
+                    <artifactId>dokka-maven-plugin</artifactId>
+                    <version>${dokka.version}</version>
+                    <executions>
+                        <execution>
+                            <phase>pre-site</phase>
+                            <goals>
+                                <goal>dokka</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <sourceLinks>
+                            <link>
+                                <dir>${project.basedir}/src/main/kotlin</dir>
+                                <url>https://github.com/ktoolz/kamchatka</url>
+                            </link>
+                        </sourceLinks>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <releaseProfiles>release</releaseProfiles>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <remoteTagging>false</remoteTagging>
+                    <suppressCommitBeforeTag>false</suppressCommitBeforeTag>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.scm</groupId>
+                        <artifactId>maven-scm-api</artifactId>
+                        <version>1.8.1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.maven.scm</groupId>
+                        <artifactId>maven-scm-provider-gitexe</artifactId>
+                        <version>1.8.1</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>2.11</version>
+                <configuration>
+                    <basedir>${basedir}</basedir>
+                    <header>etc/header.txt</header>
+                    <quiet>false</quiet>
+                    <failIfMissing>true</failIfMissing>
+                    <aggregate>true</aggregate>
+                    <strictCheck>true</strictCheck>
+                    <includes>
+                        <include>**/src/**</include>
+                    </includes>
+                    <useDefaultExcludes>true</useDefaultExcludes>
+                    <mapping>
+                        <ecmd>XML_STYLE</ecmd>
+                        <mwe>XML_STYLE</mwe>
+                        <ext>SLASHSTAR_STYLE</ext>
+                        <xpt>XML_STYLE</xpt>
+                        <java>SLASHSTAR_STYLE</java>
+                        <kt>SLASHSTAR_STYLE</kt>
+                        <aj>SLASHSTAR_STYLE</aj>
+                        <properties>SCRIPT_STYLE</properties>
+                        <xml>XML_STYLE</xml>
+                    </mapping>
+                    <useDefaultMapping>false</useDefaultMapping>
+                    <properties>
+                        <year>2016</year>
+                    </properties>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+                <executions>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
         <dependency>
@@ -63,34 +371,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <sourceDirectory>src/main/kotlin</sourceDirectory>
-        <testSourceDirectory>src/test/kotlin</testSourceDirectory>
-
-        <plugins>
-            <plugin>
-                <groupId>org.jetbrains.kotlin</groupId>
-                <artifactId>kotlin-maven-plugin</artifactId>
-                <version>${kotlin.version}</version>
-                <executions>
-                    <execution>
-                        <id>compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <phase>test-compile</phase>
-                        <goals>
-                            <goal>test-compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
 </project>
